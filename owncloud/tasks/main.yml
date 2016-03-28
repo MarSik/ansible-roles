@@ -1,0 +1,10 @@
+- name: "Deploy owncloud service"
+  docker:
+    name: "owncloud"
+    env:
+      VIRTUAL_HOST: "{{ owncloud.hostname }}"
+    volumes:
+      - "{{ owncloud.data }}/config:/var/www/html/config"
+      - "{{ owncloud.data }}/apps:/var/www/html/apps"
+      - "{{ owncloud.data }}/data:/var/www/html/data"
+

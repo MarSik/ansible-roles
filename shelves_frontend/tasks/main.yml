@@ -1,0 +1,20 @@
+- name: Prepare a configuration directory for shelves frontend
+  file:
+    path: "{{ docker.config_dir }}/{{ docker.service }}"
+    state: directory
+    mode: 0700
+
+- name: Copy over the docker compose configuration for shelves frontend
+  template:
+    src: docker-compose.yml
+    dest: "{{ docker.config_dir }}/{{ docker.service }}/docker-compose.yml"
+
+- name: Run shelves frontend service using docker-compose
+  command: docker-compose up arg1
+  args:
+    chdir: "{{ docker.config_dir }}/{{ docker.service }}"
+  environment:
+    API_VIRTUAL_HOST: "{{ shelves.backend.hostname }}"
+    WEB_VIRTUAL_HOST: "{{ shelves.frontend.hostname }}"
+
+

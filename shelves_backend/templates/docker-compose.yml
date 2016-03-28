@@ -1,0 +1,33 @@
+memcached:
+  image: memcached:latest
+  restart: always
+
+mariadb:
+  image: mariadb:10.1
+  restart: always
+  volumes:
+    - "${SHELVES_DATABASE}:/var/lib/mysql"
+  environment:
+    - "MYSQL_USER={{ docker.service }}"
+    - "MYSQL_PASSWORD={{ secret.database.password }}"
+    - "MYSQL_DATABASE=${MYSQL_DATABASE}"
+    - "MYSQL_ROOT_PASSWORD={{ secret.database.root_password }}"
+
+backend:
+  image: marsik/shelves-backend
+  restart: always
+  links:
+    - memcached
+    - mariadb
+  ports:
+    - 8080
+    # DEBUG PORT - 8000
+  volumes:
+    - "${SHELVES_CONFIG}:/etc/shelves"
+    - "${SHELVES_DATA}:/shelves"
+  environment:
+    - "VIRTUAL_HOST=${API_VIRTUAL_HOST}"
+    - "MEMCACHED_SERVER=memcached"
+    - "MYSQL_SERVER=mariadb"
+    - "MYSQL_DATABASE=${MYSQL_DATABASE}"
+

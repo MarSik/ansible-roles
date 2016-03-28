@@ -1,0 +1,9 @@
+docker:
+  shelves:
+    backend:
+      hostname: api.shelves.cz
+    frontend:
+      hostname: app.shelves.cz
+  config_dir: /etc/docker
+  service: shelves_frontend
+

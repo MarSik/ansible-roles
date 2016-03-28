@@ -1,0 +1,21 @@
+docker:
+  config_dir: /etc/docker
+  service: shelves
+secret:
+  shelves:
+    backend:
+      hostname: api.shelves.cz
+    frontend:
+      hostname: app.shelves.cz
+  database:
+    password:
+    root_password:
+  google:
+    oauth:
+      id:
+      secret:
+  github:
+    oauth:
+      id:
+      secret:
+

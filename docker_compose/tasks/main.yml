@@ -1,0 +1,5 @@
+- name: Install Docker compose packages
+  yum:
+    name: docker-compose
+    state: installed
+

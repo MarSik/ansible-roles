@@ -1,0 +1,13 @@
+- name: Nginx reverse proxy
+  docker:
+    name: nginx-reverse-proxy
+    image: jwilder/nginx-proxy
+    ports: 80:80,443:443
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /etc/ssl/certs:/etc/nginx/certs
+    pull: always
+    restart_policy: always
+    restart_policy_retry: 20
+    state: reloaded
+

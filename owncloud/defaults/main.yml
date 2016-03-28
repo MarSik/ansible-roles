@@ -1,0 +1,4 @@
+owncloud:
+  hostname: moje.marsik.org
+  data: /var/www/html
+

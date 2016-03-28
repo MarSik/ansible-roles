@@ -1,0 +1,35 @@
+# template the application.properties and docker-compose.yml to the dest host
+- name: Prepare a configuration directory for shelves backend
+  file:
+    path: "{{ docker.config_dir }}/{{ docker.service }}"
+    state: directory
+    mode: 0700
+
+- name: Copy over the docker compose configuration for shelves backend
+  template:
+    src: docker-compose.yml
+    dest: "{{ docker.config_dir }}/{{ docker.service }}/docker-compose.yml"
+
+- name: Copy over the backend configuration
+  template:
+    src: application.properties
+    dest: "{{ docker.config_dir }}/{{ docker.service }}/application.properties"
+
+- name: Create database volume
+  command: docker volume create --name=shelves-database
+
+- name: Create data volume
+  command: docker volume create --name=shelves-data
+
+- name: Run shelves backend service using docker-compose
+  command: docker-compose up arg1
+  args:
+    chdir: "{{ docker.config_dir }}/{{ docker.service }}"
+  environment:
+    MYSQL_DATABASE: "{{ docker.service }}"
+    SHELVES_DATABASE: "{{ docker.service }}-database"
+    SHELVES_DATA: "{{ docker.service }}-data"
+    SHELVES_CONFIG: "{{ docker.config_dir }}/{{ docker.service }}"
+    API_VIRTUAL_HOST: "{{ shelves.backend.hostname }}"
+    WEB_VIRTUAL_HOST: "{{ shelves.frontend.hostname }}"
+
