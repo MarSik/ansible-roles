@@ -1,5 +1,6 @@
 - name: "Deploy owncloud service"
   docker:
+    image: owncloud
     name: "owncloud"
     env:
       VIRTUAL_HOST: "{{ owncloud.hostname }}"

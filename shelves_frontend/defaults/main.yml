@@ -5,5 +5,5 @@ docker:
     frontend:
       hostname: app.shelves.cz
   config_dir: /etc/docker
-  service: shelves_frontend
+service: shelves_frontend
 

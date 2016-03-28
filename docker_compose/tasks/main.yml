@@ -1,5 +1,15 @@
-- name: Install Docker compose packages
+- name: Enable EPEL
   yum:
-    name: docker-compose
+    name: http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
     state: installed
+
+- name: Install pip
+  yum:
+    name: python-pip
+    state: installed
+
+- name: Install Docker compose packages
+  pip:
+    name: docker-compose
+    state: present
 

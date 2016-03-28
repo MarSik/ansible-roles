@@ -1,6 +1,6 @@
+service: shelves
 docker:
   config_dir: /etc/docker
-  service: shelves
 secret:
   shelves:
     backend:

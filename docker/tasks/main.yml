@@ -1,8 +1,15 @@
 ---
+- name: Add Virt SIG CentOS repository
+  copy:
+    src: virt7-sig.repo
+    dest: /etc/yum.repos.d/virt7-sig.repo
+
 - name: Install Docker packages
   yum:
     name: docker,docker-python
     state: installed
+
+# JoinControllers=cpu,cpuacct,cpuset freezer,devices
 
 - name: Make sure docker is running
   service:
