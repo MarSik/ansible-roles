@@ -31,9 +31,12 @@
     name: prometheus-push
     image: prom/pushgateway
     pull: always
+    ports: 9091
     restart_policy: always
     restart_policy_retry: 10
     state: reloaded
+    env:
+      VIRTUAL_HOST: "push.{{ prometheus.hostname }}"
 
 - name: Connect push gw to scraping network
   command: docker network connect prometheus_net prometheus-push
@@ -67,6 +70,7 @@
   docker:
     name: grafana
     image: grafana/grafana
+    ports: 3000
     volumes:
       - grafana-db:/var/lib/grafana
       - /etc/grafana
