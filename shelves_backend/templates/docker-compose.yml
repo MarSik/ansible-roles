@@ -27,6 +27,7 @@ backend:
     - "${SHELVES_DATA}:/shelves"
   environment:
     VIRTUAL_HOST: "${API_VIRTUAL_HOST}"
+    VIRTUAL_PORT: 8080
     MEMCACHED_SERVER: memcached
     MYSQL_SERVER: mariadb
     MYSQL_DATABASE: "${MYSQL_DATABASE}"
