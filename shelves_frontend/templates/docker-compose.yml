@@ -2,10 +2,10 @@ frontend:
   restart: always
   image: marsik/shelves-frontend
   environment:
-    - "API_SERVER=https://${API_VIRTUAL_HOST}"
-    - "API_BASE="
-    - "API_NAMESPACE=/v1"
-    - "VIRTUAL_HOST=${WEB_VIRTUAL_HOST}"
+    API_SERVER: "https://${API_VIRTUAL_HOST}"
+    API_BASE: ""
+    API_NAMESPACE: "/v1"
+    VIRTUAL_HOST: "${WEB_VIRTUAL_HOST}"
   ports:
     - 80
 

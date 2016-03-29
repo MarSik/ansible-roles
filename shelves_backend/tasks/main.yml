@@ -1,3 +1,11 @@
+- name: Check validity of database root password
+  fail: msg="The root password for the database has to be defined"
+  when: secret.database.root_password == ''
+
+- name: Check validity of database user password
+  fail: msg="The user password for the database has to be defined"
+  when: secret.database.password == ''
+
 # template the application.properties and docker-compose.yml to the dest host
 - name: Prepare a configuration directory for shelves backend
   file:

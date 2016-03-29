@@ -2,6 +2,10 @@
 # database and the push endpoint.
 
 ---
+- name: Check validity of grafana admin password
+  fail: msg="The grafana admin password has to be defined"
+  when: secret.grafana.password == ''
+
 - name: Prometheus scraping network
   command: docker network create prometheus_net
   ignore_errors: yes
@@ -9,22 +13,17 @@
 - name: Prometheus data volume
   command: docker volume create --name=prometheus-db-data
 
-- name: Prometheus config volume
-  command: docker volume create --name=prometheus-db-etc
+# template the application.properties and docker-compose.yml to the dest host
+- name: Prepare a configuration directory for shelves backend
+  file:
+    path: "{{ docker.config_dir }}/{{ service }}"
+    state: directory
+    mode: 0700
 
-- name: Copy the prometheus config over
+- name: Copy over the prometheus configuration
   copy:
-    src: 'prometheus.yml'
-    dest: '/tmp/prometheus.yml'
-
-- name: Update the data volume
-  docker:
-    name: prometheus-db-data-updater
-    volumes:
-      - /tmp/prometheus.yml:/tmp/prometheus.yml
-      - prometheus-db-etc:/etc/prometheus
-    image: busybox
-    command: "/bin/sh -c 'cp -r /tmp/prometheus.yml /etc/prometheus'"
+    src: prometheus.yml
+    dest: "{{ docker.config_dir }}/{{ service }}/prometheus.yml"
 
 - name: Prometheus push gateway
   docker:
@@ -48,7 +47,7 @@
     ports: 9090
     volumes:
       - prometheus-db-data:/prometheus
-      - prometheus-db-etc:/etc/prometheus
+      - "{{ docker.config_dir }}/{{ service }}:/etc/prometheus"
     pull: always
     restart_policy: always
     restart_policy_retry: 10

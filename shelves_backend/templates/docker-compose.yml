@@ -8,17 +8,17 @@ mariadb:
   volumes:
     - "${SHELVES_DATABASE}:/var/lib/mysql"
   environment:
-    - "MYSQL_USER={{ service }}"
-    - "MYSQL_PASSWORD={{ secret.database.password }}"
-    - "MYSQL_DATABASE=${MYSQL_DATABASE}"
-    - "MYSQL_ROOT_PASSWORD={{ secret.database.root_password }}"
+    MYSQL_USER: "{{ service }}"
+    MYSQL_PASSWORD: "{{ secret.database.password }}"
+    MYSQL_DATABASE: "${MYSQL_DATABASE}"
+    MYSQL_ROOT_PASSWORD: "{{ secret.database.root_password }}"
 
 backend:
   image: marsik/shelves-backend
   restart: always
   links:
-    - memcached
-    - mariadb
+    - "memcached:memcached"
+    - "mariadb:mariadb"
   ports:
     - 8080
     # DEBUG PORT - 8000
@@ -26,8 +26,8 @@ backend:
     - "${SHELVES_CONFIG}:/etc/shelves"
     - "${SHELVES_DATA}:/shelves"
   environment:
-    - "VIRTUAL_HOST=${API_VIRTUAL_HOST}"
-    - "MEMCACHED_SERVER=memcached"
-    - "MYSQL_SERVER=mariadb"
-    - "MYSQL_DATABASE=${MYSQL_DATABASE}"
+    VIRTUAL_HOST: "${API_VIRTUAL_HOST}"
+    MEMCACHED_SERVER: memcached
+    MYSQL_SERVER: mariadb
+    MYSQL_DATABASE: "${MYSQL_DATABASE}"
 
