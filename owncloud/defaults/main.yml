@@ -1,4 +1,7 @@
 owncloud:
   hostname: moje.marsik.org
   data: /var/www/html
-
+secret:
+  owncloud:
+    db_password:
+    db_root_password:

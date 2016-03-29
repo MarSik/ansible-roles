@@ -1,11 +1,14 @@
 - name: Nginx reverse proxy
   docker:
     name: nginx-reverse-proxy
-    image: jwilder/nginx-proxy
-    ports: 80:80,443:443
+    image: eforce21/letsencrypt-nginx-proxy:1.0.2
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - /etc/ssl/certs:/etc/nginx/certs
+    env:
+      LETSENCRYPT_EMAIL: "info@marsik.org"
     pull: always
     restart_policy: always
     restart_policy_retry: 20
