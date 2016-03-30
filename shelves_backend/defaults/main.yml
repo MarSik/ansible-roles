@@ -18,4 +18,7 @@ secret:
     oauth:
       id:
       secret:
+  mailgun:
+    key:
+    domain:
 
