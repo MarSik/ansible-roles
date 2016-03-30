@@ -1,14 +1,35 @@
+- name: Create the Lets encrypt certificate directory
+  file:
+    path: /etc/ssl/certs/letsencrypt
+    mode: 0700
+    state: directory
+
 - name: Nginx reverse proxy
   docker:
     name: nginx-reverse-proxy
-    image: eforce21/letsencrypt-nginx-proxy:1.0.2
+    image: jwilder/nginx-proxy
     ports:
       - "80:80"
       - "443:443"
     volumes:
+      - /etc/ssl/certs/letsencrypt:/etc/nginx/certs:ro
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
-    env:
-      LETSENCRYPT_EMAIL: "info@marsik.org"
+    pull: always
+    restart_policy: always
+    restart_policy_retry: 20
+    state: reloaded
+
+- name: Lets encrypt certificate service
+  docker:
+    name: letsencrypt-nginx-proxy-companion
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    volumes:
+      - /etc/ssl/certs/letsencrypt:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    volumes_from:
+      - nginx-reverse-proxy
     pull: always
     restart_policy: always
     restart_policy_retry: 20

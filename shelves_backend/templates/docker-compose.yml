@@ -27,6 +27,8 @@ backend:
     - "${SHELVES_DATA}:/shelves"
   environment:
     VIRTUAL_HOST: "${API_VIRTUAL_HOST}"
+    LETSENCRYPT_HOST: "${API_VIRTUAL_HOST}"
+    LETSENCRYPT_EMAIL: "{{ shelves.backend.email }}"
     VIRTUAL_PORT: 8080
     MEMCACHED_SERVER: memcached
     MYSQL_SERVER: mariadb
