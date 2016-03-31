@@ -1,24 +1,15 @@
 service: shelves
-docker:
-  config_dir: /etc/docker
-secret:
-  shelves:
-    backend:
-      hostname: api.shelves.cz
-    frontend:
-      hostname: app.shelves.cz
-  database:
-    password:
-    root_password:
-  google:
-    oauth:
-      id:
-      secret:
-  github:
-    oauth:
-      id:
-      secret:
-  mailgun:
-    key:
-    domain:
+docker_config_dir: /etc/docker
+shelves_backend_hostname: api.shelves.cz
+shelves_backend_email: root@example.com
+shelves_frontend_hostname: app.shelves.cz
+
+shelves_sec_database_password:
+shelves_sec_database_root_password:
+shelves_sec_google_oauth_id:
+shelves_sec_google_oauth_secret:
+shelves_sec_github_oauth_id:
+shelves_sec_github_oauth_secret:
+shelves_sec_mailgun_key:
+shelves_sec_mailgun_domain:
 

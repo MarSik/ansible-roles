@@ -9,9 +9,9 @@ mariadb:
     - "${SHELVES_DATABASE}:/var/lib/mysql"
   environment:
     MYSQL_USER: "{{ service }}"
-    MYSQL_PASSWORD: "{{ secret.database.password }}"
+    MYSQL_PASSWORD: "{{ shelves_sec_database_password }}"
     MYSQL_DATABASE: "${MYSQL_DATABASE}"
-    MYSQL_ROOT_PASSWORD: "{{ secret.database.root_password }}"
+    MYSQL_ROOT_PASSWORD: "{{ shelves_sec_database_root_password }}"
 
 backend:
   image: marsik/shelves-backend
@@ -26,9 +26,9 @@ backend:
     - "${SHELVES_CONFIG}:/etc/shelves"
     - "${SHELVES_DATA}:/shelves"
   environment:
-    VIRTUAL_HOST: "${API_VIRTUAL_HOST}"
-    LETSENCRYPT_HOST: "${API_VIRTUAL_HOST}"
-    LETSENCRYPT_EMAIL: "{{ shelves.backend.email }}"
+    VIRTUAL_HOST: "{{ shelves_backend_hostname }}"
+    LETSENCRYPT_HOST: "{{ shelves_backend_hostname }}"
+    LETSENCRYPT_EMAIL: "{{ shelves_backend_email }}"
     VIRTUAL_PORT: 8080
     MEMCACHED_SERVER: memcached
     MYSQL_SERVER: mariadb

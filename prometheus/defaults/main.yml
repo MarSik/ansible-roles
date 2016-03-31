@@ -1,7 +1,4 @@
 service: prometheus
-docker:
-  config_dir: /etc/docker
-secret:
-  grafana:
-    password:
+docker_config_dir: /etc/docker
+grafana_sec_password:
 

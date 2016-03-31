@@ -4,26 +4,26 @@
 ---
 - name: Check validity of grafana admin password
   fail: msg="The grafana admin password has to be defined"
-  when: secret.grafana.password == ''
+  when: grafana_sec_password == ''
 
 - name: Prometheus scraping network
-  command: docker network create prometheus_net
+  command: "docker network create {{ service }}_net"
   ignore_errors: yes
 
 - name: Prometheus data volume
-  command: docker volume create --name=prometheus-db-data
+  command: "docker volume create --name={{ service }}-db-data"
 
 # template the application.properties and docker-compose.yml to the dest host
-- name: Prepare a configuration directory for shelves backend
+- name: "Prepare a configuration directory for {{ service }}"
   file:
-    path: "{{ docker.config_dir }}/{{ service }}"
+    path: "{{ docker_config_dir }}/{{ service }}"
     state: directory
     mode: 0700
 
 - name: Copy over the prometheus configuration
   copy:
     src: prometheus.yml
-    dest: "{{ docker.config_dir }}/{{ service }}/prometheus.yml"
+    dest: "{{ docker_config_dir }}/{{ service }}/prometheus.yml"
 
 - name: Prometheus push gateway
   docker:
@@ -35,33 +35,33 @@
     restart_policy_retry: 10
     state: reloaded
     env:
-      VIRTUAL_HOST: "push.{{ prometheus.hostname }}"
-      LETSENCRYPT_HOST: "push.{{ prometheus.hostname }}"
-      LETSENCRYPT_EMAIL: "{{ prometheus.email }}"
+      VIRTUAL_HOST: "push.{{ prometheus_hostname }}"
+      LETSENCRYPT_HOST: "push.{{ prometheus_hostname }}"
+      LETSENCRYPT_EMAIL: "{{ prometheus_email }}"
 
 - name: Connect push gw to scraping network
-  command: docker network connect prometheus_net prometheus-push
+  command: "docker network connect {{ service }}_net prometheus-push"
 
 - name: Prometheus time series db
   docker:
-    name: prometheus-db
+    name: "{{ service }}-db"
     image: prom/prometheus
     ports: 9090
     volumes:
-      - prometheus-db-data:/prometheus
-      - "{{ docker.config_dir }}/{{ service }}:/etc/prometheus"
+      - "{{ service }}-db-data:/prometheus"
+      - "{{ docker_config_dir }}/{{ service }}:/etc/prometheus"
     pull: always
     restart_policy: always
     restart_policy_retry: 10
     state: reloaded
     env:
       PUSH_GW: 9091
-      VIRTUAL_HOST: "{{ prometheus.hostname }}"
-      LETSENCRYPT_HOST: "{{ prometheus.hostname }}"
-      LETSENCRYPT_EMAIL: "{{ prometheus.email }}"
+      VIRTUAL_HOST: "{{ prometheus_hostname }}"
+      LETSENCRYPT_HOST: "{{ prometheus_hostname }}"
+      LETSENCRYPT_EMAIL: "{{ prometheus_email }}"
 
 - name: Connect Prometheus to scraping network
-  command: docker network connect prometheus_net prometheus-db
+  command: "docker network connect {{ service }}_net prometheus-db"
 
 - name: Grafana dabase volume
   command: docker volume create --name=grafana-db
@@ -78,17 +78,17 @@
       - grafana-db:/var/lib/grafana
       - /etc/grafana
     env:
-      GF_SECURITY_ADMIN_PASSWORD: "{{ secret.grafana.password }}"
-      VIRTUAL_HOST: "{{ grafana.hostname }}"
-      LETSENCRYPT_HOST: "{{ grafana.hostname }}"
-      LETSENCRYPT_EMAIL: "{{ grafana.email }}"
+      GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_sec_password }}"
+      VIRTUAL_HOST: "{{ grafana_hostname }}"
+      LETSENCRYPT_HOST: "{{ grafana_hostname }}"
+      LETSENCRYPT_EMAIL: "{{ grafana_email }}"
     pull: always
     restart_policy: always
     restart_policy_retry: 10
     state: reloaded
 
 - name: Connect Grafana to scraping network
-  command: docker network connect prometheus_net grafana
+  command: "docker network connect {{ service }}_net grafana"
 
 ...
 

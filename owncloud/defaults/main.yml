@@ -1,8 +1,8 @@
-owncloud:
-  hostname: moje.marsik.org
-  email: admin@example.com
-  data: /var/www/html
-secret:
-  owncloud:
-    db_password:
-    db_root_password:
+owncloud_hostname: moje.marsik.org
+owncloud_email: admin@example.com
+owncloud_vol_apps: owncloud-apps
+owncloud_vol_data: owncloud-data
+owncloud_vol_config: owncloud-config
+owncloud_sec_db_password:
+owncloud_sec_db_root_password:
+
