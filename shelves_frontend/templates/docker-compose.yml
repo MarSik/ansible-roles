@@ -4,7 +4,7 @@ frontend:
   environment:
     API_SERVER: "https://{{ shelves_backend_hostname }}"
     API_BASE: ""
-    API_NAMESPACE: "/v1"
+    API_NAMESPACE: "v1"
     VIRTUAL_HOST: "{{ shelves_frontend_hostname }}"
     LETSENCRYPT_HOST: "{{ shelves_frontend_hostname }}"
     LETSENCRYPT_EMAIL: "{{ shelves_frontend_email }}"
