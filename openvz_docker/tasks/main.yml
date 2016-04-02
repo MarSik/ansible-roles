@@ -1,0 +1,26 @@
+- name: "Update systemd to mount proper cgroups for Docker support"
+  replace: >
+    dest=/etc/systemd/system.conf
+    regexp='^#JoinControllers=.*$'
+    replace='JoinControllers=cpu,cpuacct,cpuset freezer,devices'
+    backup=yes
+  register: config
+
+- name: Restart machine
+  command: shutdown -r now "Ansible updates triggered"
+  async: 0
+  poll: 0
+  ignore_errors: true
+  when: config.changed
+
+- name: Waiting for server to come back
+  connection: local
+  wait_for:
+    host: "{{ inventory_hostname }}"
+    port: 22
+    delay: 1
+    timeout: 300
+    state: started
+  sudo: false
+  when: config.changed
+
