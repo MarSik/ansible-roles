@@ -21,6 +21,6 @@
     delay: 1
     timeout: 300
     state: started
-  sudo: false
+  become: false
   when: config.changed
 

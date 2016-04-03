@@ -1,0 +1,38 @@
+- name: Install Fail2ban
+  yum:
+    name: fail2ban-all
+    state: installed
+
+- name: Disable firewalld
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: Enable fail2ban
+  service:
+    name: fail2ban
+    state: started
+    enabled: yes
+
+- name: Enable SSH ports
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: ssh
+    state: present
+
+- name: Enable HTTP ports
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: http
+    state: present
+
+- name: Enable HTTPS ports
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: https
+    state: present
+
