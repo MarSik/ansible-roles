@@ -4,6 +4,12 @@
     mode: 0700
     state: directory
 
+- name: Create vhost customization directory
+  file:
+    path: /etc/nginx/vhost.d
+    mode: 0755
+    state: directory
+
 - name: Nginx reverse proxy
   docker:
     name: nginx-reverse-proxy
@@ -13,7 +19,7 @@
       - "443:443"
     volumes:
       - /etc/ssl/certs/letsencrypt:/etc/nginx/certs:ro
-      - /etc/nginx/vhost.d
+      - /etc/nginx/vhost.d:/etc/nginx/vhost.d:ro
       - /usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
     pull: always
@@ -27,6 +33,7 @@
     image: jrcs/letsencrypt-nginx-proxy-companion
     volumes:
       - /etc/ssl/certs/letsencrypt:/etc/nginx/certs:rw
+      - /etc/nginx/vhost.d:/etc/nginx/vhost.d:rw
       - /var/run/docker.sock:/var/run/docker.sock:ro
     volumes_from:
       - nginx-reverse-proxy
