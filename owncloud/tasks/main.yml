@@ -19,6 +19,7 @@
   docker:
     image: mariadb:10.1
     name: "owncloud-database"
+    net: bridge
     volumes:
       - "owncloud-database:/var/lib/mysql"
     env:
@@ -41,6 +42,7 @@
   docker:
     image: owncloud
     name: "owncloud"
+    net: bridge
     links:
       - "owncloud-database"
     env:

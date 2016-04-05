@@ -14,6 +14,7 @@
   docker:
     name: nginx-reverse-proxy
     image: jwilder/nginx-proxy
+    net: bridge
     ports:
       - "80:80"
       - "443:443"
@@ -31,6 +32,7 @@
   docker:
     name: letsencrypt-nginx-proxy-companion
     image: jrcs/letsencrypt-nginx-proxy-companion
+    net: bridge
     volumes:
       - /etc/ssl/certs/letsencrypt:/etc/nginx/certs:rw
       - /etc/nginx/vhost.d:/etc/nginx/vhost.d:rw
