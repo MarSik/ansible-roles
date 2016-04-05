@@ -22,12 +22,26 @@
   template:
     src: application.properties
     dest: "{{ docker_config_dir }}/{{ service }}/application.properties"
+  register: backconfig
 
 - name: Create database volume
   command: docker volume create --name=shelves-database
 
 - name: Create data volume
   command: docker volume create --name=shelves-data
+
+- name: Restart shelves backend to apply new configuration
+  when: backconfig.changed
+  command: docker-compose restart backend -t 30
+  args:
+    chdir: "{{ docker_config_dir }}/{{ service }}"
+  environment:
+    MYSQL_DATABASE: "{{ service }}"
+    SHELVES_DATABASE: "{{ service }}-database"
+    SHELVES_DATA: "{{ service }}-data"
+    SHELVES_CONFIG: "{{ docker_config_dir }}/{{ service }}"
+    API_VIRTUAL_HOST: "{{ shelves_backend_hostname }}"
+    WEB_VIRTUAL_HOST: "{{ shelves_frontend_hostname }}"
 
 - name: Run shelves backend service using docker-compose
   command: docker-compose up -d
