@@ -13,3 +13,5 @@ shelves_sec_github_oauth_secret:
 shelves_sec_mailgun_key:
 shelves_sec_mailgun_domain:
 
+prometheus_service:
+

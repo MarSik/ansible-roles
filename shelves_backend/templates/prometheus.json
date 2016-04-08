@@ -1,0 +1,11 @@
+[
+  {
+    "targets": [
+      "{{ shelves_backend_hostname }}"
+    ],
+    "labels": {
+      "job": "{{ service }}_backend"
+    }
+  }
+]
+

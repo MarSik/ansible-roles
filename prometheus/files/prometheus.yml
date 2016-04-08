@@ -9,3 +9,9 @@ scrape_configs:
     target_groups:
       - targets: ['prometheus-push:9091']
 
+  - job_name: 'dynamic'
+    scrape_interval: 10s
+    file_sd_configs:
+      - names:
+        - "/etc/prometheus/dyn_*.json"
+

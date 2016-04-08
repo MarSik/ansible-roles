@@ -55,3 +55,9 @@
     API_VIRTUAL_HOST: "{{ shelves_backend_hostname }}"
     WEB_VIRTUAL_HOST: "{{ shelves_frontend_hostname }}"
 
+- name: Configure local Prometheus to scrape the metrics
+  template:
+    src: prometheus.json
+    dest: "{{ docker_config_dir }}/{{ prometheus_service }}/dyn_{{ service }}.json"
+  when: prometheus_service
+
