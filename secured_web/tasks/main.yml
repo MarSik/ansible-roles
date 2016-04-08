@@ -15,11 +15,40 @@
     state: started
     enabled: yes
 
+- name: Enable ICMP
+  iptables:
+    chain: INPUT
+    jump: ACCEPT
+    protocol: icmp
+    state: present
+
+- name: Enable all connections from lo
+  iptables:
+    chain: INPUT
+    in_interface: lo
+    jump: ACCEPT
+    state: present
+
+- name: Enable all connections from docker
+  iptables:
+    chain: INPUT
+    in_interface: docker+
+    jump: ACCEPT
+    state: present
+
+- name: Enable established and related connections
+  iptables:
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+    state: present
+
 - name: Enable SSH ports
   iptables:
     chain: INPUT
     protocol: tcp
     destination_port: ssh
+    jump: ACCEPT
     state: present
 
 - name: Enable HTTP ports
@@ -27,6 +56,7 @@
     chain: INPUT
     protocol: tcp
     destination_port: http
+    jump: ACCEPT
     state: present
 
 - name: Enable HTTPS ports
@@ -34,5 +64,9 @@
     chain: INPUT
     protocol: tcp
     destination_port: https
+    jump: ACCEPT
     state: present
+
+- name: Reject all other traffic
+  command: iptables -P INPUT DROP
 
