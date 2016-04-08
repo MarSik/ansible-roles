@@ -1,0 +1,10 @@
+[Unit]
+Description=Prometheus Node Exporter
+
+[Service]
+User={{ prometheus_node_username }}
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=default.target
+

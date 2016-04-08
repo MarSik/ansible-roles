@@ -1,0 +1,52 @@
+---
+- name: "Create promnode user"
+  user:
+    createhome: no
+    name: "{{ prometheus_node_username }}"
+    state: present
+    system: yes
+
+- name: Install Prometheus node exporter i386
+  get_url:
+    sha256sum: f75b2305a6a568c3aa06269c9f3e9299707f28a807d7828b47156e57f9cee041
+    dest: /root/node_exporter.tar.gz
+    url: https://github.com/prometheus/node_exporter/releases/download/0.11.0/node_exporter-0.11.0.linux-386.tar.gz
+  when: ansible_architecture | match("i.86|x86_32")
+
+- name: Install Prometheus node exporter x86_64
+  get_url:
+    sha256sum: f38daeec08a7a5be0b04d4633dae54cf7587af5dda011604b80eba97eaf606c8
+    dest: /root/node_exporter.tar.gz
+    url: https://github.com/prometheus/node_exporter/releases/download/0.11.0/node_exporter-0.11.0.linux-amd64.tar.gz
+  when: ansible_architecture | match(".*64")
+
+- name: Install Prometheus node exporter
+  unarchive:
+    copy: no
+    dest: /usr/local/bin
+    mode: 0755
+    src: /root/node_exporter.tar.gz
+  register: download
+
+- name: Create the Prometheus node service file
+  template:
+    src: prometheus-node-exporter.service
+    dest: "/etc/systemd/system/{{ prometheus_node_service }}.service"
+  register: service_file
+  when: download.changed
+
+- name: Reload systemd
+  command: systemctl daemon-reload
+  when: service_file.changed
+
+- name: (Re)start the node exporter service
+  service:
+    enabled: yes
+    state: "{{ 'restarted' if download.changed else 'started' }}"
+    name: "{{ prometheus_node_service }}"
+
+- name: Register to local prometheus instance
+  template:
+    src: dyn_node_exporter.json
+    dest: "{{ docker_config_dir }}/{{ prometheus_service }}/dyn_node_exporter.json"
+

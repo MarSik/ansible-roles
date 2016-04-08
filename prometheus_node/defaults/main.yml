@@ -1,0 +1,5 @@
+---
+prometheus_node_username: promnode
+prometheus_node_service: prometheus-node-exporter
+prometheus_service:
+
