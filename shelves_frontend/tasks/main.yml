@@ -9,6 +9,11 @@
     src: docker-compose.yml
     dest: "{{ docker_config_dir }}/{{ service }}/docker-compose.yml"
 
+- name: Pull up-to-date images
+  command: docker-compose pull --ignore-pull-failures
+  args:
+    chdir: "{{ docker_config_dir }}/{{ service }}"
+
 - name: Run shelves frontend service using docker-compose
   command: docker-compose up -d
   args:

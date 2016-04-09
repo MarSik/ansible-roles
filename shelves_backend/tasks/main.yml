@@ -30,6 +30,11 @@
 - name: Create data volume
   command: docker volume create --name=shelves-data
 
+- name: Pull up-to-date images
+  command: docker-compose pull --ignore-pull-failures
+  args:
+    chdir: "{{ docker_config_dir }}/{{ service }}"
+
 - name: Restart shelves backend to apply new configuration
   when: backconfig.changed
   command: docker-compose restart backend -t 30
