@@ -1,0 +1,48 @@
+- name: Install sudo
+  yum:
+    name: sudo
+    state: latest
+
+- name: Add admin user
+  user:
+    name: "{{ secure_login_user }}"
+    password: "{{ secure_login_password }}"
+    update_password: on_create
+    createhome: yes
+    shell: /usr/bin/bash
+    skeleton: yes
+    groups: wheel
+
+- name: "Add authorized keys for {{ secure_login_user }} user"
+  authorized_key:
+    user: "{{ secure_login_user }}"
+    key: "{{ lookup('file', '{{ item }}') }}"
+    manage_dir: yes
+    state: present
+  with_items: "{{ secure_login_ssh_key_pub }}"
+  when: secure_login_ssh_key_pub
+
+- name: Change ssh port
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^Port\\s"
+    line: "Port {{ secure_login_ssh_port }}"
+    state: present
+  notify: Restart ssh
+
+- name: Disallow password authentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication no"
+    state: present
+  notify: Restart ssh
+
+- name: Disallow root SSH access
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin no"
+    state: present
+  notify: Restart ssh
+

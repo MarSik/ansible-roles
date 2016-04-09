@@ -1,0 +1,6 @@
+secure_login_user:
+secure_login_password:
+secure_login_ssh_port: 22
+secure_login_ssh_key_pub:
+  - "~/.ssh/id_rsa.pub"
+
