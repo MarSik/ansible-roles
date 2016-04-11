@@ -31,6 +31,7 @@
     name: prometheus-push
     image: prom/pushgateway
     net: bridge
+    expose: 9091
     pull: always
     restart_policy: always
     restart_policy_retry: 10
@@ -50,7 +51,7 @@
     name: "{{ service }}-db"
     image: prom/prometheus
     net: bridge
-    ports: 9090
+    expose: 9090
     volumes:
       - "{{ service }}-db-data:/prometheus"
       - "{{ docker_config_dir }}/{{ service }}:/etc/prometheus"
@@ -80,7 +81,7 @@
     name: grafana
     image: grafana/grafana
     net: bridge
-    ports: 3000
+    expose: 3000
     volumes:
       - grafana-db:/var/lib/grafana
       - /etc/grafana

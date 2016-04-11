@@ -19,7 +19,7 @@ backend:
   links:
     - "memcached:memcached"
     - "mariadb:mariadb"
-  ports:
+  expose:
     - 8080
     # DEBUG PORT - 8000
   volumes:

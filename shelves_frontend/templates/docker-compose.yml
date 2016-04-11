@@ -6,8 +6,9 @@ frontend:
     API_BASE: ""
     API_NAMESPACE: "v1"
     VIRTUAL_HOST: "{{ shelves_frontend_hostname }}"
+    VIRTUAL_PORT: 80
     LETSENCRYPT_HOST: "{{ shelves_frontend_hostname }}"
     LETSENCRYPT_EMAIL: "{{ shelves_frontend_email }}"
-  ports:
+  expose:
     - 80
 
