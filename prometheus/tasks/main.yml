@@ -32,7 +32,6 @@
     image: prom/pushgateway
     net: bridge
     pull: always
-    ports: 9091
     restart_policy: always
     restart_policy_retry: 10
     state: reloaded
