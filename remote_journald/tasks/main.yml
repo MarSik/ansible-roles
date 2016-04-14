@@ -1,0 +1,50 @@
+- name: Install rsyslog
+  yum:
+    name: rsyslog
+    state: latest
+
+- name: Enable remote logging from JournalD
+  lineinfile:
+    dest: /etc/systemd/journald.conf
+    line: "ForwardToSyslog=yes"
+    regexp: "^#?ForwardToSyslog="
+    state: present
+  notify:
+    - Restart journald
+
+- name: Enable journald module for rsyslog
+  lineinfile:
+    dest: /etc/rsyslog.conf
+    line: "$ModLoad imjournal # provides access to the systemd journal"
+    regexp: "ModLoad imjournal"
+    state: present
+  notify:
+    - Restart rsyslog
+
+- name: Disable local rsyslog logging
+  lineinfile:
+    dest: /etc/rsyslog.conf
+    line: "$OmitLocalLogging on"
+    regexp: "OmitLocalLogging o"
+    state: present
+  notify:
+    - Restart rsyslog
+
+- name: Configure journal state file
+  lineinfile:
+    dest: /etc/rsyslog.conf
+    line: "$IMJournalStateFile imjournal.state"
+    regexp: "IMJournalStateFile "
+    state: present
+  notify:
+    - Restart rsyslog
+
+- name: Configure remote logging
+  lineinfile:
+    dest: /etc/rsyslog.conf
+    line: '*.* {{ "@@" if remote_syslog_proto == "tcp" else "@" }}{{ remote_syslog_host }}'
+    regexp: '^\*.\* {{ "@@" if remote_syslog_proto == "tcp" else "@" }}'
+    state: '{{ "present" if remote_syslog_host else "absent" }}'
+  notify:
+    - Restart rsyslog
+
