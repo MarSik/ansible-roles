@@ -1,7 +1,19 @@
 - name: Install Fail2ban
   yum:
-    name: fail2ban-all
-    state: installed
+    name: fail2ban-systemd,fail2ban-server
+    state: latest
+
+- name: Configure Fail2ban logging
+  copy:
+    dest: /etc/fail2ban/fail2ban.local
+    content: |
+      [Definition]
+      logtarget = SYSLOG
+
+- name: Remove Fail2ban firewalld integration
+  yum:
+    name: fail2ban-firewalld
+    state: absent
 
 - name: Disable firewalld
   service:
