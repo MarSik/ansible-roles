@@ -24,6 +24,7 @@
       - /usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
     pull: always
+    timeout: "{{ docker_timeout }}"
     restart_policy: always
     restart_policy_retry: 20
     state: reloaded
@@ -40,6 +41,7 @@
     volumes_from:
       - nginx-reverse-proxy
     pull: always
+    timeout: "{{ docker_timeout }}"
     restart_policy: always
     restart_policy_retry: 20
     state: reloaded

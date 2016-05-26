@@ -1,4 +1,5 @@
 service: prometheus
 docker_config_dir: /etc/docker
+docker_timeout: 60
 grafana_sec_password:
 

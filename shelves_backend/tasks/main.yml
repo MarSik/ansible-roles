@@ -37,7 +37,7 @@
 
 - name: Restart shelves backend to apply new configuration
   when: backconfig.changed
-  command: docker-compose restart backend -t 30
+  command: "docker-compose restart backend -t {{ docker_timeout }}"
   args:
     chdir: "{{ docker_config_dir }}/{{ service }}"
   environment:
@@ -49,7 +49,7 @@
     WEB_VIRTUAL_HOST: "{{ shelves_frontend_hostname }}"
 
 - name: Run shelves backend service using docker-compose
-  command: docker-compose up -d
+  command: "docker-compose up -d -t {{ docker_timeout }}"
   args:
     chdir: "{{ docker_config_dir }}/{{ service }}"
   environment:

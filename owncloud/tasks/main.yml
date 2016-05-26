@@ -31,7 +31,7 @@
     restart_policy: always
     restart_policy_retry: 20
     state: reloaded
-
+    timeout: "{{ docker_timeout }}"
 
 - name: Increase the allowed body size
   copy:
@@ -57,4 +57,5 @@
     restart_policy: always
     restart_policy_retry: 20
     state: reloaded
+    timeout: "{{ docker_timeout }}"
 

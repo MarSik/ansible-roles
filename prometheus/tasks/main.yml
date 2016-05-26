@@ -36,6 +36,7 @@
     restart_policy: always
     restart_policy_retry: 10
     state: reloaded
+    timeout: "{{ docker_timeout }}"
     env:
       VIRTUAL_HOST: "push.{{ prometheus_hostname }}"
       LETSENCRYPT_HOST: "push.{{ prometheus_hostname }}"
@@ -59,6 +60,7 @@
     restart_policy: always
     restart_policy_retry: 10
     state: reloaded
+    timeout: "{{ docker_timeout }}"
     env:
       PUSH_GW: 9091
       VIRTUAL_HOST: "{{ prometheus_hostname }}"
@@ -94,6 +96,7 @@
     restart_policy: always
     restart_policy_retry: 10
     state: reloaded
+    timeout: "{{ docker_timeout }}"
 
 - name: Connect Grafana to scraping network
   command: "docker network connect {{ service }}_net grafana"

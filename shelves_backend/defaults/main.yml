@@ -1,5 +1,6 @@
 service: shelves
 docker_config_dir: /etc/docker
+docker_timeout: 60
 shelves_backend_hostname: api.shelves.cz
 shelves_backend_email: root@example.com
 shelves_frontend_hostname: app.shelves.cz

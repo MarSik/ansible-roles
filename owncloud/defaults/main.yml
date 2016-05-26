@@ -1,3 +1,4 @@
+docker_timeout: 60
 owncloud_hostname: moje.marsik.org
 owncloud_email: admin@example.com
 owncloud_vol_apps: owncloud-apps
