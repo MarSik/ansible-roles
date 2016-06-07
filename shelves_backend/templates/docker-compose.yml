@@ -13,12 +13,20 @@ mariadb:
     MYSQL_DATABASE: "${MYSQL_DATABASE}"
     MYSQL_ROOT_PASSWORD: "{{ shelves_sec_database_root_password }}"
 
+mosquitto:
+  image: jllopis/mosquitto
+  restart: always
+  expose:
+    - 1883
+    - 9883
+
 backend:
   image: marsik/shelves-backend
   restart: always
   links:
     - "memcached:memcached"
     - "mariadb:mariadb"
+    - "mosquitto:mosquitto"
   expose:
     - 8080
     # DEBUG PORT - 8000
@@ -32,5 +40,6 @@ backend:
     VIRTUAL_PORT: 8080
     MEMCACHED_SERVER: memcached
     MYSQL_SERVER: mariadb
+    MQTT_SERVER: mosquitto
     MYSQL_DATABASE: "${MYSQL_DATABASE}"
 
