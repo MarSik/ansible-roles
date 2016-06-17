@@ -21,5 +21,6 @@
   environment:
     API_VIRTUAL_HOST: "{{ shelves_backend_hostname }}"
     WEB_VIRTUAL_HOST: "{{ shelves_frontend_hostname }}"
+    COMPOSE_HTTP_TIMEOUT: "{{ docker_timeout }}"
 
 
