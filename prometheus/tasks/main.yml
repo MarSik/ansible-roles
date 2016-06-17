@@ -24,6 +24,7 @@
   copy:
     src: prometheus.yml
     dest: "{{ docker_config_dir }}/{{ service }}/prometheus.yml"
+  register: promcfg
 
 - name: Prometheus push gateway
   register: prompush
@@ -59,7 +60,7 @@
     pull: always
     restart_policy: always
     restart_policy_retry: 10
-    state: reloaded
+    state: '{{ "restarted" if promcfg.changed else "reloaded" }}'
     timeout: "{{ docker_timeout }}"
     env:
       PUSH_GW: 9091
