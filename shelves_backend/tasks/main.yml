@@ -24,6 +24,11 @@
     dest: "{{ docker_config_dir }}/{{ service }}/application.properties"
   register: backconfig
 
+- name: Copy over the backend proxy configuration
+  template:
+    src: nginx.conf
+    dest: "/etc/nginx/vhost.d/{{ shelves_backend_hostname }}"
+
 - name: Create database volume
   command: docker volume create --name=shelves-database
 
