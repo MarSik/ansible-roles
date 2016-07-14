@@ -42,7 +42,7 @@
 
 - name: Restart shelves backend to apply new configuration
   when: backconfig.changed
-  command: "docker-compose restart backend -t {{ docker_timeout }}"
+  command: "docker-compose restart -t {{ docker_timeout }} backend"
   args:
     chdir: "{{ docker_config_dir }}/{{ service }}"
   environment:

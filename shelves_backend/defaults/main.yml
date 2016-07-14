@@ -5,7 +5,8 @@ shelves_backend_hostname: api.shelves.cz
 shelves_backend_email: root@example.com
 shelves_frontend_hostname: app.shelves.cz
 
-shelves_backend_max_upload_size: 30m
+shelves_backend_max_upload_size: 10MB
+shelves_backend_max_request_size: 10MB
 
 shelves_sec_database_password:
 shelves_sec_database_root_password:
