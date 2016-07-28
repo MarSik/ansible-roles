@@ -40,11 +40,9 @@
     - Restart rsyslog
 
 - name: Configure remote logging
-  lineinfile:
-    dest: /etc/rsyslog.conf
-    line: '*.* {{ "@@" if remote_syslog_proto == "tcp" else "@" }}{{ remote_syslog_host }}'
-    regexp: '^\*.\* {{ "@@" if remote_syslog_proto == "tcp" else "@" }}'
-    state: '{{ "present" if remote_syslog_host else "absent" }}'
+  template:
+    dest: /etc/rsyslog.d/remote.conf
+    src: remote.conf
   notify:
     - Restart rsyslog
 
