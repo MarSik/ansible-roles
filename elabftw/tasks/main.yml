@@ -1,0 +1,47 @@
+- name: Check validity of database root password
+  fail: msg="The root password for the database has to be defined"
+  when: elabftw_sec_database_root_password == ''
+
+- name: Check validity of database user password
+  fail: msg="The user password for the database has to be defined"
+  when: elabftw_sec_database_password == ''
+
+- name: Check validity of secret key
+  fail: msg="The {{ service }} secret key has to be defined"
+  when: elabftw_sec_secret_key == ''
+
+# template the application.properties and docker-compose.yml to the dest host
+- name: Prepare a configuration directory
+  file:
+    path: "{{ docker_config_dir }}/{{ service }}"
+    state: directory
+    mode: 0700
+
+- name: Copy over the docker compose configuration
+  template:
+    src: docker-compose.yml
+    dest: "{{ docker_config_dir }}/{{ service }}/docker-compose.yml"
+
+- name: Copy over the backend proxy configuration
+  template:
+    src: nginx.conf
+    dest: "/etc/nginx/vhost.d/{{ elabftw_hostname }}"
+
+- name: Create database volume
+  command: "docker volume create --name={{ service }}-db"
+
+- name: Create data volume
+  command: "docker volume create --name={{ service }}-data"
+
+- name: Pull up-to-date images
+  command: docker-compose pull --ignore-pull-failures
+  args:
+    chdir: "{{ docker_config_dir }}/{{ service }}"
+
+- name: Run using docker-compose
+  command: "docker-compose up -d -t {{ docker_timeout }}"
+  args:
+    chdir: "{{ docker_config_dir }}/{{ service }}"
+  environment:
+    COMPOSE_HTTP_TIMEOUT: "{{ docker_timeout }}"
+

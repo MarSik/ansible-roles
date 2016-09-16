@@ -1,0 +1,13 @@
+service: elabftw
+docker_config_dir: /etc/docker
+docker_timeout: 60
+
+elabftw_hostname:
+elabftw_email:
+elabftw_max_upload_size: 30MB
+elabftw_max_request_size: 30MB
+
+elabftw_sec_database_password:
+elabftw_sec_database_root_password:
+elabftw_sec_secret_key:
+
