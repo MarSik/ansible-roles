@@ -7,57 +7,53 @@
 web:
     image: elabftw/docker-elabftw
     restart: always
-    container_name: elabftw
     environment:
-        - VIRTUAL_HOST={{ elabftw_hostname }}
-        - LETSENCRYPT_HOST={{ elabftw_hostname }}
-        - LETSENCRYPT_EMAIL={{ elabftw_email }}
-        # no need to change
-        - DB_HOST=mysql
-        # no need to change
-        - DB_NAME=
-        # no need to change
-        - DB_USER=elabftw
-        # need to change
-        - DB_PASSWORD={{ elabftw_sec_database_password }}
-        # get the secret key from https://demo.elabftw.net/install/generateSecretKey.php
-        - SECRET_KEY={{ elabftw_sec_secret_key }}
-        # optional: change to your server name in nginx config
-        - SERVER_NAME={{ elabftw_hostname }}
-        # optional: disable https, use this to have an http server listening on port 443
-        # useful if the SSL stack is handled by haproxy or something alike
-        - DISABLE_HTTPS=true
-        # set to true to use letsencrypt certificates
-        - ENABLE_LETSENCRYPT=false
-    ports:
-        # if you want elabftw to run on a different port, change the first number
-        # host:container
-        - 443
+      VIRTUAL_HOST: "{{ elabftw_hostname }}"
+      LETSENCRYPT_HOST: "{{ elabftw_hostname }}"
+      LETSENCRYPT_EMAIL: "{{ elabftw_email }}"
+      # no need to change
+      DB_HOST: mysql
+      DB_NAME:
+      DB_USER: elabftw
+      # need to change
+      DB_PASSWORD: "{{ elabftw_sec_database_password }}"
+      # get the secret key from https://demo.elabftw.net/install/generateSecretKey.php
+      SECRET_KEY: "{{ elabftw_sec_secret_key }}"
+      # optional: change to your server name in nginx config
+      SERVER_NAME: "{{ elabftw_hostname }}"
+      # optional: disable https, use this to have an http server listening on port 443
+      # useful if the SSL stack is handled by haproxy or something alike
+      DISABLE_HTTPS: "true"
+      # set to true to use letsencrypt certificates
+      ENABLE_LETSENCRYPT: "false"
+    expose:
+      # if you want elabftw to run on a different port, change the first number
+      # host:container
+      - 443
     volumes:
-        # this is where you will keep the uploaded files persistently
-        # host:container
-        - {{ service }}-data:/elabftw/uploads
-        # if you've enabled letsencrypt, uncomment the line below
-        # path to the folder with SSL certificates (must contain fullchain.pem and privkey.pem)
-        # host:container
-        #- /etc/letsencrypt:/ssl
+      # this is where you will keep the uploaded files persistently
+      # host:container
+      - "{{ service }}-data:/elabftw/uploads"
+      # if you've enabled letsencrypt, uncomment the line below
+      # path to the folder with SSL certificates (must contain fullchain.pem and privkey.pem)
+      # host:container
+      #- /etc/letsencrypt:/ssl
     links:
         - mysql
 mysql:
     image: mysql:5.7
     restart: always
-    container_name: mysql
     environment:
-        # need to change
-        - MYSQL_ROOT_PASSWORD={{ elabftw_sec_database_root_password }}
-        # no need to change
-        - MYSQL_DATABASE=elabftw
-        # no need to change
-        - MYSQL_USER=elabftw
-        # need to change
-        - MYSQL_PASSWORD={{ elabftw_sec_database_password }}
+      # need to change
+      MYSQL_ROOT_PASSWORD: "{{ elabftw_sec_database_root_password }}"
+      # no need to change
+      MYSQL_DATABASE: elabftw
+      # no need to change
+      MYSQL_USER: elabftw
+      # need to change
+      MYSQL_PASSWORD: "{{ elabftw_sec_database_password }}"
     volumes:
-        # this is where you will keep the database persistently
-        # host:container
-        - {{ service }}-db:/var/lib/mysql
+      # this is where you will keep the database persistently
+      # host:container
+      - "{{ service }}-db:/var/lib/mysql"
 

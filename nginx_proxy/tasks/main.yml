@@ -13,7 +13,7 @@
 - name: Nginx reverse proxy
   docker:
     name: nginx-reverse-proxy
-    image: jwilder/nginx-proxy
+    image: jwilder/nginx-proxy:0.3.0
     net: bridge
     ports:
       - "80:80"
@@ -45,4 +45,6 @@
     restart_policy: always
     restart_policy_retry: 20
     state: reloaded
+    env:
+      DEBUG: "true"
 
