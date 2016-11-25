@@ -24,3 +24,11 @@
   become: false
   when: config.changed
 
+- name: Install yum versionlock
+  yum:
+    name: yum-plugin-versionlock
+    state: installed
+
+- name: Lock Docker to 1.10
+  command: yum versionlock docker-1.10.3-46.el7.14
+
