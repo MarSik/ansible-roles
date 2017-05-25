@@ -13,7 +13,7 @@
 - name: Nginx reverse proxy
   docker:
     name: nginx-reverse-proxy
-    image: jwilder/nginx-proxy:0.3.0
+    image: jwilder/nginx-proxy:latest
     net: bridge
     ports:
       - "80:80"
