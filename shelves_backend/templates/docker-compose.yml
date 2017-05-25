@@ -42,4 +42,5 @@ backend:
     MYSQL_SERVER: mariadb
     MQTT_SERVER: mosquitto
     MYSQL_DATABASE: "${MYSQL_DATABASE}"
+    JAVA_MAX_MEM: "{{ shelves_backend_java_max_mem }}"
 
