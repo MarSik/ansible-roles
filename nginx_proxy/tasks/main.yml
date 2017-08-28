@@ -11,11 +11,11 @@
     state: directory
 
 - name: Nginx reverse proxy
-  docker:
+  docker_container:
     name: nginx-reverse-proxy
     image: jwilder/nginx-proxy:latest
-    net: bridge
-    ports:
+    network_mode: bridge
+    published_ports:
       - "80:80"
       - "443:443"
     volumes:
@@ -23,28 +23,28 @@
       - /etc/nginx/vhost.d:/etc/nginx/vhost.d:ro
       - /usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
-    pull: always
+    pull: True
     timeout: "{{ docker_timeout }}"
     restart_policy: always
-    restart_policy_retry: 20
-    state: reloaded
+    restart_retries: 20
+    state: started
 
 - name: Lets encrypt certificate service
-  docker:
+  docker_container:
     name: letsencrypt-nginx-proxy-companion
     image: jrcs/letsencrypt-nginx-proxy-companion
-    net: bridge
+    network_mode: bridge
     volumes:
       - /etc/ssl/certs/letsencrypt:/etc/nginx/certs:rw
       - /etc/nginx/vhost.d:/etc/nginx/vhost.d:rw
       - /var/run/docker.sock:/var/run/docker.sock:ro
     volumes_from:
       - nginx-reverse-proxy
-    pull: always
+    pull: True
     timeout: "{{ docker_timeout }}"
     restart_policy: always
-    restart_policy_retry: 20
-    state: reloaded
+    restart_retries: 20
+    state: started
     env:
       DEBUG: "true"
 
