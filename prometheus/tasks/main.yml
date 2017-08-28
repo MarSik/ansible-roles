@@ -6,10 +6,6 @@
   fail: msg="The grafana admin password has to be defined"
   when: grafana_sec_password == ''
 
-- name: Prometheus scraping network
-  command: "docker network create {{ service }}_net"
-  ignore_errors: yes
-
 - name: Prometheus data volume
   command: "docker volume create --name={{ service }}-db-data"
 
@@ -28,50 +24,47 @@
 
 - name: Prometheus push gateway
   register: prompush
-  docker:
+  docker_container:
     name: prometheus-push
     image: prom/pushgateway
-    net: bridge
+    networks:
+      - name: "{{ service }}_net"
+      - name: bridge
     expose: 9091
-    pull: always
+    pull: True
     restart_policy: always
-    restart_policy_retry: 10
-    state: reloaded
+    restart_retries: 10
+    state: started
     timeout: "{{ docker_timeout }}"
     env:
       VIRTUAL_HOST: "push.{{ prometheus_hostname }}"
       LETSENCRYPT_HOST: "push.{{ prometheus_hostname }}"
       LETSENCRYPT_EMAIL: "{{ prometheus_email }}"
 
-- name: Connect push gw to scraping network
-  command: "docker network connect {{ service }}_net prometheus-push"
-  when: prompush.changed
-
 - name: Prometheus time series db
   register: prometheus
-  docker:
+  docker_container:
     name: "{{ service }}-db"
     image: prom/prometheus
-    net: bridge
+    networks:
+      - name: "{{ service }}_net"
+      - name: bridge
     expose: 9090
     command: "-config.file=/etc/prometheus/prometheus.yml -storage.local.path=/prometheus -web.console.libraries=/usr/share/prometheus/console_libraries -web.console.templates=/usr/share/prometheus/consoles -storage.local.memory-chunks={{ prometheus_memory_chunks }}"
     volumes:
       - "{{ service }}-db-data:/prometheus"
       - "{{ docker_config_dir }}/{{ service }}:/etc/prometheus"
-    pull: always
+    pull: True
     restart_policy: always
-    restart_policy_retry: 10
-    state: '{{ "restarted" if promcfg.changed else "reloaded" }}'
+    restart_retries: 10
+    state: started
+    restart: "{{ promcfg |changed }}"
     timeout: "{{ docker_timeout }}"
     env:
       PUSH_GW: 9091
       VIRTUAL_HOST: "{{ prometheus_hostname }}"
       LETSENCRYPT_HOST: "{{ prometheus_hostname }}"
       LETSENCRYPT_EMAIL: "{{ prometheus_email }}"
-
-- name: Connect Prometheus to scraping network
-  command: "docker network connect {{ service }}_net prometheus-db"
-  when: prometheus.changed
 
 - name: Grafana dabase volume
   command: docker volume create --name=grafana-db
@@ -81,10 +74,12 @@
 
 - name: Graphing service
   register: grafana
-  docker:
+  docker_container:
     name: grafana
     image: grafana/grafana
-    net: bridge
+    networks:
+      - name: "{{ service }}_net"
+      - name: bridge
     expose: 3000
     volumes:
       - grafana-db:/var/lib/grafana
@@ -94,14 +89,11 @@
       VIRTUAL_HOST: "{{ grafana_hostname }}"
       LETSENCRYPT_HOST: "{{ grafana_hostname }}"
       LETSENCRYPT_EMAIL: "{{ grafana_email }}"
-    pull: always
+    pull: True
     restart_policy: always
-    restart_policy_retry: 10
-    state: reloaded
+    restart_retries: 10
+    state: started
     timeout: "{{ docker_timeout }}"
 
-- name: Connect Grafana to scraping network
-  command: "docker network connect {{ service }}_net grafana"
-  when: grafana.changed
 ...
 
