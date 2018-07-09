@@ -5,10 +5,17 @@
     dest: /etc/yum.repos.d/virt7-sig.repo
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
-- name: Install Docker packages
+- name: Install Docker packages (CentOS)
   yum:
     name: docker,docker-python
     state: installed
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Install Docker packages (Fedora)
+  yum:
+    name: docker,python-docker-py
+    state: installed
+  when: ansible_distribution == 'Fedora'
 
 
 - name: Make sure docker is running
