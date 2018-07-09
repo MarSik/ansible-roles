@@ -6,13 +6,13 @@
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: Install Docker packages (CentOS)
-  yum:
+  package:
     name: docker,docker-python
     state: installed
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: Install Docker packages (Fedora)
-  yum:
+  package:
     name: docker,python-docker-py
     state: installed
   when: ansible_distribution == 'Fedora'
