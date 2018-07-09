@@ -3,31 +3,13 @@
   copy:
     src: virt7-sig.repo
     dest: /etc/yum.repos.d/virt7-sig.repo
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: Install Docker packages
   yum:
     name: docker,docker-python
     state: installed
 
-# JoinControllers=cpu,cpuacct,cpuset freezer,devices
-- name: Prepare docker systemd override directory
-  file:
-    path: /etc/systemd/system/docker.service.d
-    state: directory
-
-- name: Make sure mount propagation is set correctly
-  copy:
-    src: clear_mount_flags.conf
-    dest: /etc/systemd/system/docker.service.d/
-  register: docker_service_updated
-
-- name: Reload docker
-  systemd:
-    enabled: yes
-    daemon_reload: yes
-    name: docker
-    state: restarted
-  when: docker_service_updated.changed
 
 - name: Make sure docker is running
   service:
