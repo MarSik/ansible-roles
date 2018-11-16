@@ -16,10 +16,10 @@
     - owncloud_database
 
 - name: "Deploy owncloud service database"
-  docker:
+  docker_container:
     image: mariadb:10.1
     name: "owncloud-database"
-    net: bridge
+    network_mode: bridge
     volumes:
       - "owncloud-database:/var/lib/mysql"
     env:
@@ -27,10 +27,10 @@
       MYSQL_PASSWORD: "{{ owncloud_sec_db_password }}"
       MYSQL_DATABASE: owncloud
       MYSQL_ROOT_PASSWORD: "{{ owncloud_sec_db_root_password }}"
-    pull: always
+    pull: True
     restart_policy: always
-    restart_policy_retry: 20
-    state: reloaded
+    restart_retries: 20
+    state: started
     timeout: "{{ docker_timeout }}"
 
 - name: Increase the allowed body size
@@ -39,10 +39,10 @@
     dest: "/etc/nginx/vhost.d/{{ owncloud_hostname }}"
 
 - name: "Deploy owncloud service"
-  docker:
+  docker_container:
     image: owncloud
     name: "owncloud"
-    net: bridge
+    network_mode: bridge
     links:
       - "owncloud-database"
     env:
@@ -53,9 +53,9 @@
       - "{{ owncloud_vol_config }}:/var/www/html/config"
       - "{{ owncloud_vol_apps }}:/var/www/html/apps"
       - "{{ owncloud_vol_data }}:/var/www/html/data"
-    pull: always
+    pull: True
     restart_policy: always
-    restart_policy_retry: 20
-    state: reloaded
+    restart_retries: 20
+    state: started
     timeout: "{{ docker_timeout }}"
 
