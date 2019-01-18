@@ -1,0 +1,61 @@
+- name: Check validity of database root password
+  fail: msg="The root password for the database has to be defined"
+  when: nextcloud_sec_db_root_password == ''
+
+- name: Check validity of nextcloud user password
+  fail: msg="The user password for the database has to be defined"
+  when: nextcloud_sec_db_password == ''
+
+- name: "Create nextcloud volumes"
+  command: "docker volume create --name={{ item }}"
+  when: item and not item.startswith("/")
+  with_items:
+    - "{{ nextcloud_vol_data }}"
+    - "{{ nextcloud_vol_apps }}"
+    - "{{ nextcloud_vol_config }}"
+    - nextcloud_database
+
+- name: "Deploy nextcloud service database"
+  docker_container:
+    image: mariadb:10.1
+    name: "nextcloud-database"
+    network_mode: bridge
+    volumes:
+      - "nextcloud-database:/var/lib/mysql"
+    env:
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: "{{ nextcloud_sec_db_password }}"
+      MYSQL_DATABASE: nextcloud
+      MYSQL_ROOT_PASSWORD: "{{ nextcloud_sec_db_root_password }}"
+    pull: True
+    restart_policy: always
+    restart_retries: 20
+    state: started
+    timeout: "{{ docker_timeout }}"
+
+- name: Increase the allowed body size
+  copy:
+    src: upload-size.conf
+    dest: "/etc/nginx/vhost.d/{{ nextcloud_hostname }}"
+
+- name: "Deploy nextcloud service"
+  docker_container:
+    image: nextcloud
+    name: "nextcloud"
+    network_mode: bridge
+    links:
+      - "nextcloud-database"
+    env:
+      LETSENCRYPT_HOST: "{{ nextcloud_hostname }}"
+      LETSENCRYPT_EMAIL: "{{ nextcloud_email }}"
+      VIRTUAL_HOST: "{{ nextcloud_hostname }}"
+    volumes:
+      - "{{ nextcloud_vol_config }}:/var/www/html/config"
+      - "{{ nextcloud_vol_apps }}:/var/www/html/custom_apps"
+      - "{{ nextcloud_vol_data }}:/var/www/html/data"
+    pull: True
+    restart_policy: always
+    restart_retries: 20
+    state: started
+    timeout: "{{ docker_timeout }}"
+

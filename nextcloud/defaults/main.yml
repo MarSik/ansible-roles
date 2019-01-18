@@ -1,0 +1,9 @@
+docker_timeout: 60
+nextcloud_hostname: moje.marsik.org
+nextcloud_email: admin@example.com
+nextcloud_vol_apps: nextcloud-apps
+nextcloud_vol_data: nextcloud-data
+nextcloud_vol_config: nextcloud-config
+nextcloud_sec_db_password:
+nextcloud_sec_db_root_password:
+
