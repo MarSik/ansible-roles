@@ -10,14 +10,20 @@
     mode: 0755
     state: directory
 
+- name: Create a network
+  docker_network:
+    name: public
+
 - name: Nginx reverse proxy
   docker_container:
     name: nginx-reverse-proxy
-    image: jwilder/nginx-proxy:latest
+    image: "jwilder/nginx-proxy:{{ nginx_version }}"
     network_mode: bridge
     published_ports:
       - "80:80"
       - "443:443"
+    networks:
+      - name: public
     volumes:
       - /etc/ssl/certs/letsencrypt:/etc/nginx/certs:ro
       - /etc/nginx/vhost.d:/etc/nginx/vhost.d:ro
