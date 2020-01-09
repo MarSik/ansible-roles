@@ -1,4 +1,5 @@
 docker_timeout: 60
+nextcloud_version: latest
 nextcloud_hostname: moje.marsik.org
 nextcloud_email: admin@example.com
 nextcloud_vol_apps: nextcloud-apps

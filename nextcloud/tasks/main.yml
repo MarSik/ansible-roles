@@ -40,7 +40,7 @@
 
 - name: "Deploy nextcloud service"
   docker_container:
-    image: nextcloud
+    image: "nextcloud:{{ nextcloud_version }}"
     name: "nextcloud"
     network_mode: bridge
     links:
