@@ -1,10 +1,10 @@
 memcached:
   image: memcached:latest
-  restart: always
+  restart: unless-stopped
 
 mariadb:
   image: mariadb:10.1
-  restart: always
+  restart: unless-stopped
   volumes:
     - "${SHELVES_DATABASE}:/var/lib/mysql"
   environment:
@@ -15,14 +15,14 @@ mariadb:
 
 mosquitto:
   image: jllopis/mosquitto
-  restart: always
+  restart: unless-stopped
   expose:
     - 1883
     - 9883
 
 backend:
   image: marsik/shelves-backend
-  restart: always
+  restart: unless-stopped
   links:
     - "memcached:memcached"
     - "mariadb:mariadb"

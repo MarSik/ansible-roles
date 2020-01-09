@@ -32,7 +32,7 @@
       - name: bridge
     expose: 9091
     pull: True
-    restart_policy: always
+    restart_policy: unless-stopped
     restart_retries: 10
     state: started
     timeout: "{{ docker_timeout }}"
@@ -55,7 +55,7 @@
       - "{{ service }}-db-data:/prometheus"
       - "{{ docker_config_dir }}/{{ service }}:/etc/prometheus"
     pull: True
-    restart_policy: always
+    restart_policy: unless-stopped
     restart_retries: 10
     state: started
     restart: "{{ promcfg |changed }}"
@@ -90,7 +90,7 @@
       LETSENCRYPT_HOST: "{{ grafana_hostname }}"
       LETSENCRYPT_EMAIL: "{{ grafana_email }}"
     pull: True
-    restart_policy: always
+    restart_policy: unless-stopped
     restart_retries: 10
     state: started
     timeout: "{{ docker_timeout }}"

@@ -17,7 +17,7 @@
 - name: Nginx reverse proxy
   docker_container:
     name: nginx-reverse-proxy
-    image: "jwilder/nginx-proxy:{{ nginx_version }}"
+    image: "jwilder/nginx-proxy:{{ nginx_proxy_version }}"
     network_mode: bridge
     published_ports:
       - "80:80"
@@ -31,7 +31,7 @@
       - /var/run/docker.sock:/tmp/docker.sock:ro
     pull: True
     timeout: "{{ docker_timeout }}"
-    restart_policy: always
+    restart_policy: unless-stopped
     state: started
 
 - name: Lets encrypt certificate service
@@ -47,7 +47,7 @@
       - nginx-reverse-proxy
     pull: True
     timeout: "{{ docker_timeout }}"
-    restart_policy: always
+    restart_policy: unless-stopped
     state: started
     env:
       DEBUG: "true"

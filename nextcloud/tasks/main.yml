@@ -28,7 +28,7 @@
       MYSQL_DATABASE: nextcloud
       MYSQL_ROOT_PASSWORD: "{{ nextcloud_sec_db_root_password }}"
     pull: True
-    restart_policy: always
+    restart_policy: unless-stopped
     restart_retries: 20
     state: started
     timeout: "{{ docker_timeout }}"
@@ -54,7 +54,7 @@
       - "{{ nextcloud_vol_apps }}:/var/www/html/custom_apps"
       - "{{ nextcloud_vol_data }}:/var/www/html/data"
     pull: True
-    restart_policy: always
+    restart_policy: unless-stopped
     restart_retries: 20
     state: started
     timeout: "{{ docker_timeout }}"

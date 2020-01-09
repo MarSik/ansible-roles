@@ -1,5 +1,5 @@
 frontend:
-  restart: always
+  restart: unless-stopped
   image: marsik/shelves-frontend
   environment:
     API_SERVER: "https://{{ shelves_backend_hostname }}"
