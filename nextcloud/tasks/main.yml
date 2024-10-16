@@ -2,60 +2,150 @@
   fail: msg="The root password for the database has to be defined"
   when: nextcloud_sec_db_root_password == ''
 
-- name: Check validity of nextcloud user password
+- name: Check validity of nextcloud db user password
   fail: msg="The user password for the database has to be defined"
   when: nextcloud_sec_db_password == ''
 
-- name: "Create nextcloud volumes"
-  command: "docker volume create --name={{ item }}"
-  when: item and not item.startswith("/")
+- name: Check validity of nextcloud admin user password
+  fail: msg="The user password for the database has to be defined"
+  when: nextcloud_sec_admin_password == ''
+
+- name: "Create nextcloud data volumes"
+  docker_volume:
+    volume_name: "{{ item }}"
   with_items:
-    - "{{ nextcloud_vol_data }}"
-    - "{{ nextcloud_vol_apps }}"
-    - "{{ nextcloud_vol_config }}"
-    - nextcloud_database
+    - "{{ service }}-data"
+    - "{{ service }}-apps"
+
+- name: "Create nextcloud config volume"
+  docker_volume:
+    volume_name: "{{ service }}-config"
+  register: nextcloud_cfg_vol
+
+- name: "Create nextcloud database volume"
+  docker_volume:
+    volume_name: "{{ service }}-database"
+  register: nextcloud_db_vol
 
 - name: "Deploy nextcloud service database"
+  when: nextcloud_db_vol is changed
+  register: nextcloud_db_init
   docker_container:
-    image: mariadb:10.1
-    name: "nextcloud-database"
-    network_mode: bridge
+    image: "mariadb:{{ nextcloud_mariadb_version }}"
+    name: "{{ service }}-database-init"
     volumes:
-      - "nextcloud-database:/var/lib/mysql"
+      - "{{ service }}-database:/var/lib/mysql"
+    # Use health check to see the db initialized
+    healthcheck:
+      interval: 10s
+      retries: 100
+      test: "MYSQL_PWD='{{ nextcloud_sec_db_root_password }}' mysql -h 127.0.0.1 -u root -e 'status'"
     env:
       MYSQL_USER: nextcloud
       MYSQL_PASSWORD: "{{ nextcloud_sec_db_password }}"
       MYSQL_DATABASE: nextcloud
       MYSQL_ROOT_PASSWORD: "{{ nextcloud_sec_db_root_password }}"
     pull: True
-    restart_policy: unless-stopped
-    restart_retries: 20
     state: started
     timeout: "{{ docker_timeout }}"
+    command: "--transaction-isolation=READ-COMMITTED"
+
+- name: Wait for nextcloud db init to finish
+  when: nextcloud_db_init is changed
+  docker_container_info:
+    name: "{{ service }}-database-init"
+  register: init_status
+  until: init_status.exists and init_status.container["State"]["Health"]["Status"] == "healthy"
+  retries: 100
+  delay: 10
+
+- name: "Cleanup nextcloud database init"
+  docker_container:
+    name: "{{ service }}-database-init"
+    state: stopped
+
+- name: "Deploy nextcloud service database"
+  docker_container:
+    image: "mariadb:{{ nextcloud_mariadb_version }}"
+    name: "{{ service }}-database"
+    volumes:
+      - "{{ service }}-database:/var/lib/mysql"
+    pull: True
+    restart_policy: unless-stopped
+    state: started
+    timeout: "{{ docker_timeout }}"
+    command: "--transaction-isolation=READ-COMMITTED"
 
 - name: Increase the allowed body size
   copy:
     src: upload-size.conf
     dest: "/etc/nginx/vhost.d/{{ nextcloud_hostname }}"
 
-- name: "Deploy nextcloud service"
+- name: "Connect nextcloud to db using docker network"
+  docker_network:
+    name: "{{ service }}-net"
+    connected:
+      - "{{ service }}-database"
+    state: present
+
+- name: "Initialize nextcloud service"
+  when: nextcloud_cfg_vol is changed
+  register: nextcloud_init
   docker_container:
     image: "nextcloud:{{ nextcloud_version }}"
-    name: "nextcloud"
+    name: "{{ service }}-nextcloud-init"
+    command: "true"
     network_mode: bridge
-    links:
-      - "nextcloud-database"
+    networks:
+      - name: "{{ service }}-net"
+    env:
+      MYSQL_HOST: "{{ service }}-database"
+      MYSQL_DATABASE: "nextcloud"
+      MYSQL_USER: "nextcloud"
+      MYSQL_PASSWORD: "{{ nextcloud_sec_db_password }}"
+      NEXTCLOUD_UPDATE: "1"
+      NEXTCLOUD_ADMIN_USER: "{{ nextcloud_admin_user }}"
+      NEXTCLOUD_ADMIN_PASSWORD: "{{ nextcloud_sec_admin_password }}"
+      NEXTCLOUD_TRUSTED_DOMAINS: "{{ nextcloud_hostname }}"
+    volumes:
+      - "{{ service }}-config:/var/www/html/config"
+      - "{{ service }}-apps:/var/www/html/custom_apps"
+      - "{{ service }}-data:/var/www/html/data"
+    pull: True
+    state: started
+    timeout: "{{ docker_timeout }}"
+
+- name: Wait for nextcloud init to finish
+  when: nextcloud_init is changed
+  docker_container_info:
+    name: "{{ service }}-nextcloud-init"
+  register: init_status
+  until: init_status.exists and init_status.container["State"]["Status"] == "exited"
+  retries: 100
+  delay: 5
+
+- name: "Cleanup nextcloud init"
+  docker_container:
+    name: "{{ service }}-nextcloud-init"
+    state: stopped
+
+- name: "Run nextcloud service"
+  docker_container:
+    image: "nextcloud:{{ nextcloud_version }}"
+    name: "{{ service }}-nextcloud"
+    network_mode: bridge
+    networks:
+      - name: "{{ service }}-net"
     env:
       LETSENCRYPT_HOST: "{{ nextcloud_hostname }}"
       LETSENCRYPT_EMAIL: "{{ nextcloud_email }}"
       VIRTUAL_HOST: "{{ nextcloud_hostname }}"
     volumes:
-      - "{{ nextcloud_vol_config }}:/var/www/html/config"
-      - "{{ nextcloud_vol_apps }}:/var/www/html/custom_apps"
-      - "{{ nextcloud_vol_data }}:/var/www/html/data"
+      - "{{ service }}-config:/var/www/html/config"
+      - "{{ service }}-apps:/var/www/html/custom_apps"
+      - "{{ service }}-data:/var/www/html/data"
     pull: True
     restart_policy: unless-stopped
-    restart_retries: 20
     state: started
     timeout: "{{ docker_timeout }}"
 

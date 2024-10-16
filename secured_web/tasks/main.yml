@@ -1,7 +1,5 @@
-- name: Install Fail2ban
-  yum:
-    name: fail2ban-systemd,fail2ban-server
-    state: latest
+- name: OS specific fail2ban and firewall tasks
+  include_tasks: "deploy-{{ansible_os_family}}.yml"
 
 - name: Configure Fail2ban logging
   copy:
@@ -9,17 +7,6 @@
     content: |
       [Definition]
       logtarget = SYSLOG
-
-- name: Remove Fail2ban firewalld integration
-  yum:
-    name: fail2ban-firewalld
-    state: absent
-
-- name: Disable firewalld
-  service:
-    name: firewalld
-    state: stopped
-    enabled: no
 
 - name: Enable fail2ban
   service:
@@ -33,6 +20,10 @@
     jump: ACCEPT
     protocol: icmp
     state: present
+    ip_version: "{{ item }}"
+  with_items:
+    - ipv4
+    - ipv6
 
 - name: Enable all connections from lo
   iptables:
@@ -40,6 +31,10 @@
     in_interface: lo
     jump: ACCEPT
     state: present
+    ip_version: "{{ item }}"
+  with_items:
+    - ipv4
+    - ipv6
 
 - name: Enable all connections from docker
   iptables:
@@ -47,6 +42,10 @@
     in_interface: docker+
     jump: ACCEPT
     state: present
+    ip_version: "{{ item }}"
+  with_items:
+    - ipv4
+    - ipv6
 
 - name: Enable established and related connections
   iptables:
@@ -54,6 +53,10 @@
     ctstate: ESTABLISHED,RELATED
     jump: ACCEPT
     state: present
+    ip_version: "{{ item }}"
+  with_items:
+    - ipv4
+    - ipv6
 
 - name: Enable SSH ports
   iptables:
@@ -62,6 +65,10 @@
     destination_port: ssh
     jump: ACCEPT
     state: present
+    ip_version: "{{ item }}"
+  with_items:
+    - ipv4
+    - ipv6
 
 - name: Enable HTTP ports
   iptables:
@@ -70,6 +77,10 @@
     destination_port: http
     jump: ACCEPT
     state: present
+    ip_version: "{{ item }}"
+  with_items:
+    - ipv4
+    - ipv6
 
 - name: Enable HTTPS ports
   iptables:
@@ -78,6 +89,10 @@
     destination_port: https
     jump: ACCEPT
     state: present
+    ip_version: "{{ item }}"
+  with_items:
+    - ipv4
+    - ipv6
 
 - name: Reject all other traffic
   command: iptables -P INPUT DROP

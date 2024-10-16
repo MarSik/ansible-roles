@@ -1,17 +1,22 @@
 - name: Install sudo
-  yum:
+  package:
     name: sudo
     state: latest
+
+- name: "Ensure group '{{ secure_login_admin_group[ansible_os_family] }}' exists"
+  group:
+    name: "{{ secure_login_admin_group[ansible_os_family] }}"
+    state: present
 
 - name: Add admin user
   user:
     name: "{{ secure_login_user }}"
-    password: "{{ secure_login_password }}"
+    password: "{{ secure_login_sec_password }}"
     update_password: on_create
     createhome: yes
-    shell: /usr/bin/bash
+    shell: /bin/bash
     skeleton: yes
-    groups: wheel
+    groups: "{{ secure_login_admin_group[ansible_os_family] }}"
 
 - name: "Add authorized keys for {{ secure_login_user }} user"
   authorized_key:

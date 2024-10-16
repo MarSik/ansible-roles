@@ -1,0 +1,25 @@
+- name: Add Docker CE repository
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+
+- name: Install containerd separately (CentOS 8)
+  package:
+    name: https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm
+    state: present
+
+- name: Install Docker packages
+  package:
+    name: docker-ce, docker-ce-cli
+    state: installed
+
+- name: Install Python interface to Docker (pip)
+  package:
+    name: python3-pip
+    state: installed
+
+
+- name: Install Python interface to Docker (docker)
+  pip:
+    name: docker
+    state: present

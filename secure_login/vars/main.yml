@@ -1,0 +1,3 @@
+secure_login_admin_group:
+  Debian: admin
+  RedHat: wheel

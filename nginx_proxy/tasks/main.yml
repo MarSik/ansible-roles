@@ -18,12 +18,11 @@
   docker_container:
     name: nginx-reverse-proxy
     image: "jwilder/nginx-proxy:{{ nginx_proxy_version }}"
-    network_mode: bridge
     published_ports:
       - "80:80"
       - "443:443"
-    networks:
-      - name: public
+    env:
+      DHPARAM_GENERATION: "false"
     volumes:
       - /etc/ssl/certs/letsencrypt:/etc/nginx/certs:ro
       - /etc/nginx/vhost.d:/etc/nginx/vhost.d:ro
@@ -33,6 +32,7 @@
     timeout: "{{ docker_timeout }}"
     restart_policy: unless-stopped
     state: started
+  register: nginx_container
 
 - name: Lets encrypt certificate service
   docker_container:
@@ -49,6 +49,7 @@
     timeout: "{{ docker_timeout }}"
     restart_policy: unless-stopped
     state: started
+    restart: "{{ nginx_container is changed }}"
     env:
       DEBUG: "true"
 

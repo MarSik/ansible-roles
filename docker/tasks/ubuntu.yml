@@ -1,0 +1,23 @@
+- debug: msg="deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+
+- name: Add docker signing key to APT
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+
+- name: Install Docker packages
+  package:
+    name:
+      - docker-ce
+      - docker-ce-cli
+    state: latest
+
+- name: Install Python interface to Docker
+  package:
+    name: python-docker
+    state: latest
+

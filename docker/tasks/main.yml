@@ -1,27 +1,37 @@
----
-- name: Add Virt SIG CentOS repository
-  copy:
-    src: virt7-sig.repo
-    dest: /etc/yum.repos.d/virt7-sig.repo
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+- name: Deploy CentOS 8
+  import_tasks: el8.yml
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
 
-- name: Install Docker packages (CentOS)
-  package:
-    name: docker,docker-python
-    state: installed
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+- name: Deploy Ubuntu
+  import_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
 
-- name: Install Docker packages (Fedora)
-  package:
-    name: docker,python-docker-py
-    state: installed
-  when: ansible_distribution == 'Fedora'
-
+- name: Deploy others
+  import_tasks: el7.yml
+  when: (ansible_os_family == "RedHat" or ansible_os_family == "Fedora") and ansible_distribution_major_version|int < 8
 
 - name: Make sure docker is running
   service:
     name: docker
     state: started
     enabled: yes
+    use: service
 
+- name: Remove test container
+  docker_container:
+    name: deploy-hello-world-test
+    state: absent
+    timeout: 600
+
+- name: Test hello world container
+  docker_container:
+    name: deploy-hello-world-test
+    image: hello-world
+    timeout: 600
+
+- name: Remove test container
+  docker_container:
+    name: deploy-hello-world-test
+    state: absent
+    timeout: 600
 

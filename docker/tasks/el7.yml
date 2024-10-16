@@ -1,0 +1,27 @@
+---
+- name: Add Virt SIG CentOS repository
+  copy:
+    src: virt7-sig.repo
+    dest: /etc/yum.repos.d/virt7-sig.repo
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Install Docker packages (CentOS)
+  package:
+    name: docker,docker-python
+    state: installed
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Install Docker packages (Fedora)
+  package:
+    name: docker,python-docker-py
+    state: installed
+  when: ansible_distribution == 'Fedora'
+
+- name: Make sure docker is running
+  service:
+    name: docker
+    state: started
+    enabled: yes
+    use: service
+
+

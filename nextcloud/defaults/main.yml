@@ -1,10 +1,10 @@
-docker_timeout: 60
-nextcloud_version: latest
+docker_timeout: 600
+service: nextcloud
+nextcloud_version: stable
+nextcloud_mariadb_version: 10.4
 nextcloud_hostname: moje.marsik.org
 nextcloud_email: admin@example.com
-nextcloud_vol_apps: nextcloud-apps
-nextcloud_vol_data: nextcloud-data
-nextcloud_vol_config: nextcloud-config
 nextcloud_sec_db_password:
 nextcloud_sec_db_root_password:
-
+nextcloud_admin_user: admin
+nextcloud_sec_admin_password: 
